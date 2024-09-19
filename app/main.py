@@ -9,9 +9,9 @@ app = FastAPI(title="API de Fecha y Contador con Redis en Docker", version="1.0.
 class FechaRequest(BaseModel):
     mostrar_hora: bool
 
-REDIS_HOST = os.getenv("REDIS_HOST", "redis")
-REDIS_PORT = int(os.getenv("REDIS_PORT", 6379))
-REDIS_DB = int(os.getenv("REDIS_DB", 0))
+REDIS_HOST = os.getenv("REDIS_HOST")
+REDIS_PORT = int(os.getenv("REDIS_PORT"))
+REDIS_DB = int(os.getenv("REDIS_DB"))
 COUNTER_KEY = "contador_api"
 
 redis_client: redis.Redis = None
