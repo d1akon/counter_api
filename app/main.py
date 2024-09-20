@@ -4,6 +4,7 @@ import os
 from routers import fecha, contador
 from utils.redis_client import redis_client
 import asyncio
+from utils.logger import logger
 
 
 app = FastAPI(
@@ -21,9 +22,9 @@ app.include_router(contador.router)
 async def startup_event():
     try:
         await redis_client.ping() #----- validando si está el sv activo
-        print("Conexión a sv Redis establecida correctamente.")
+        logger.info("Conexión a sv Redis establecida correctamente.")
     except Exception as e:
-        print(f"Error al conectar con sv Redis: {e}")
+        logger.error(f"Error al conectar con sv Redis: {e}")
         raise e
 
 #----- CERRAR CONEXION CON SV REDIS
@@ -31,6 +32,6 @@ async def startup_event():
 async def shutdown_event():
     try:
         await redis_client.close() #----- cerrando conexion con sv
-        print("Conexión a sv Redis cerrada.")
+        logger.info("Conexión a sv Redis cerrada.")
     except Exception as e:
-        print(f"Error al cerrar la conexión con sv Redis: {e}")
+        logger.error(f"Error al cerrar la conexión con sv Redis: {e}")
