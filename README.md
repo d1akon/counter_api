@@ -1,17 +1,17 @@
-# counter_api
+# 🔢 counter_api 
 
-### Descripción
+### 🔹 **Descripción**
 API creada con FastAPI que proporciona dos funciones principales:
 
-* Recibir la fecha actual: Devuelve la fecha del dia actual, y tiene la opción de poder recibir tambien la hora.
-* Contador de Llamadas a api: Mantiene un contador de cuántas veces se ha realizado solicitudes al endpoint /fecha de la API.
+* **Recibir la fecha actual:** Devuelve la fecha del dia actual, y tiene la opción de poder recibir tambien la hora.
+* **Contador de Llamadas a api:** Mantiene un contador de cuántas veces se ha realizado solicitudes al endpoint /fecha de la API.
 
 La persistencia del contador se maneja utilizando Redis, garantizando que los datos se mantengan incluso si la aplicación se reinicia. Además, la API está containerizada con Docker para facilitar su deployment y testing.
 
-### Requisitos Previos
-* Docker | docker-compose.
+### 🔹 Requisitos Previos
+* Docker & docker-compose.
 
-### Instalacion y uso
+### 🔹 Instalacion y uso
 
 1. Clonar el repo a tu máquina local.
 2. [OPCIONAL] Cambiar variables de entorno si es que querés cambiar los puertos de redis.
