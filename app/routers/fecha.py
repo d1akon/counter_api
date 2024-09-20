@@ -1,8 +1,9 @@
 #----- IMPORTS
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
+#from pydantic import BaseModel
 from datetime import datetime
 from utils.redis_client import redis_client, COUNTER_KEY
+from models.fecha import FechaRequest, FechaResponse
 
 #----- DEFINICIÓN DE ROUTER
 router = APIRouter(
@@ -10,10 +11,7 @@ router = APIRouter(
     tags=["Fecha"]
 )
 
-class FechaRequest(BaseModel):
-    mostrar_hora: bool
-
-@router.post("/", response_model=dict)
+@router.post("/", response_model=FechaResponse)
 async def obtener_fecha(fecha_request: FechaRequest):
     try:
         #----- incremento del contador cada vez que le pegan a este endpoint
@@ -27,4 +25,4 @@ async def obtener_fecha(fecha_request: FechaRequest):
     else:
         fecha_formateada = datetime.now().strftime("%Y-%m-%d")
     
-    return {"fecha": fecha_formateada, "contador": contador}
+    return {"fecha": fecha_formateada}

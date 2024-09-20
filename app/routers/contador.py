@@ -1,6 +1,7 @@
 #----- IMPORTS
 from fastapi import APIRouter, HTTPException
 from utils.redis_client import redis_client, COUNTER_KEY
+from models.contador import ContadorResponse
 
 #----- DEFINICIÓN DE ROUTER
 router = APIRouter(
@@ -8,7 +9,7 @@ router = APIRouter(
     tags=["Contador"]
 )
 
-@router.get("/", response_model=dict)
+@router.get("/", response_model=ContadorResponse)
 async def obtener_contador():
     try:
         valor_contador = await redis_client.get(COUNTER_KEY)
