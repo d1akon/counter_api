@@ -1,65 +1,36 @@
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
-from datetime import datetime
-import redis.asyncio as redis
+#----- IMPORTS
+from fastapi import FastAPI
 import os
+from routers import fecha, contador
+from utils.redis_client import redis_client
+import asyncio
 
-app = FastAPI(title="API de Fecha y Contador con Redis en Docker", version="1.0.2")
 
-class FechaRequest(BaseModel):
-    mostrar_hora: bool
+app = FastAPI(
+    title="counter_api con Redis y Docker",
+    version="1.0.3",
+    description="API que muestra la fecha y un contador de llamadas usando Redis para persistencia de los counts."
+)
 
-REDIS_HOST = os.getenv("REDIS_HOST")
-REDIS_PORT = int(os.getenv("REDIS_PORT"))
-REDIS_DB = int(os.getenv("REDIS_DB"))
-COUNTER_KEY = "contador_api"
+#----- ROUTERS DEFINIDAS
+app.include_router(fecha.router)
+app.include_router(contador.router)
 
-redis_client: redis.Redis = None
-
+#----- INICIAR CONEXION CON SV REDIS
 @app.on_event("startup")
 async def startup_event():
-    global redis_client
     try:
-        redis_client = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB, decode_responses=True)
-        await redis_client.ping()
-        print("Conexión a Redis establecida correctamente.")
+        await redis_client.ping() #----- validando si está el sv activo
+        print("Conexión a sv Redis establecida correctamente.")
     except Exception as e:
-        print(f"Error al conectar con Redis: {e}")
+        print(f"Error al conectar con sv Redis: {e}")
         raise e
 
+#----- CERRAR CONEXION CON SV REDIS
 @app.on_event("shutdown")
 async def shutdown_event():
-    global redis_client
-    if redis_client:
-        await redis_client.close()
-        print("Conexión a Redis cerrada.")
-
-@app.post("/fecha", response_model=dict)
-async def obtener_fecha(fecha_request: FechaRequest):
-    global redis_client
     try:
-        # Incrementa el contador de manera atómica
-        contador = await redis_client.incr(COUNTER_KEY)
+        await redis_client.close() #----- cerrando conexion con sv
+        print("Conexión a sv Redis cerrada.")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error al incrementar el contador: {e}")
-    
-    ahora = datetime.now()
-    if fecha_request.mostrar_hora:
-        fecha_formateada = ahora.strftime("%Y-%m-%d %H:%M:%S")
-    else:
-        fecha_formateada = ahora.strftime("%Y-%d-%m")
-    
-    return {"fecha": fecha_formateada}
-
-@app.get("/contador", response_model=dict)
-async def obtener_contador():
-    global redis_client
-    try:
-        valor_contador = await redis_client.get(COUNTER_KEY)
-        # Si el contador no existe, inicialízalo en 0
-        if valor_contador is None:
-            valor_contador = 0
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error al obtener el contador: {e}")
-    
-    return {"contador": int(valor_contador)}
+        print(f"Error al cerrar la conexión con sv Redis: {e}")
